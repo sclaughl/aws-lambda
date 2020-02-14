@@ -62,10 +62,14 @@ class AwsLambda extends Component {
     })
 
     const awsIamRole = await this.load('@serverless/aws-iam-role')
-
-    // If no role exists, create a default role
     let outputsAwsIamRole
-    if (!config.role) {
+
+    // if inputs.role_arn exists then just use that -- don't create a role
+    if (inputs.hasOwnProperty('role_arn')) {
+      this.context.debug('ROLE WAS PROVIDED!!!!')
+      this.context.debug(inputs.role_arn)
+      config.role = { arn: inputs.role_arn }
+    } else if (!config.role) { // If no role exists, create a default role
       this.context.debug(`No role provided for lambda ${config.name}.`)
 
       outputsAwsIamRole = await awsIamRole({
